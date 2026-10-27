@@ -11,7 +11,7 @@ using System.Linq;
 namespace PostCodeSerialMonitor.Services;
 public class ConfigurationService
 {
-    private const int SUPPORTED_FORMAT_VERSION = 1;
+    private const int SUPPORTED_FORMAT_VERSION = 2;
     private readonly string _configFilePath;
     private readonly IOptionsMonitor<AppConfiguration> _configurationMonitor;
     private readonly ILogger<ConfigurationService> _logger;

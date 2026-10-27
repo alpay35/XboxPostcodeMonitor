@@ -461,4 +461,22 @@
     <value>Language was changed. Please restart the application for it to take effect.</value>
     <comment>In ViewModels/ConfigurationDialogViewModel.cs</comment>
   </data>
+  <data name="FilterAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="FilterErrorsOnly" xml:space="preserve">
+    <value>Errors Only</value>
+  </data>
+  <data name="FilterWarningsAndErrors" xml:space="preserve">
+    <value>Warnings &amp; Errors</value>
+  </data>
+  <data name="FilterSearchPlaceholder" xml:space="preserve">
+    <value>Search code, name or description...</value>
+  </data>
+  <data name="AutoReconnect" xml:space="preserve">
+    <value>Auto Reconnect</value>
+  </data>
+  <data name="FilterLabel" xml:space="preserve">
+    <value>Filter:</value>
+  </data>
 </root>

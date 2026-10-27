@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ExpectedStringToken" xml:space="preserve">
+    <value>Dize belirteci bekleniyordu</value>
+  </data>
+  <data name="FailedReadingString" xml:space="preserve">
+    <value>Alan dize olarak okunamadı</value>
+  </data>
+  <data name="InvalidBase64String" xml:space="preserve">
+    <value>Geçersiz base64-url dizesi</value>
+  </data>
+  <data name="ConfigurationSaved" xml:space="preserve">
+    <value>Yapılandırma başarıyla kaydedildi</value>
+  </data>
+  <data name="FailedSaveConfiguration" xml:space="preserve">
+    <value>Yapılandırma kaydedilemedi</value>
+  </data>
+  <data name="ConfigurationUpdated" xml:space="preserve">
+    <value>Yapılandırma başarıyla güncellendi</value>
+  </data>
+  <data name="FailedUpdateConfiguration" xml:space="preserve">
+    <value>Yapılandırma güncellenemedi</value>
+  </data>
+  <data name="MetaFileNotExist" xml:space="preserve">
+    <value>Tanım Yükleme: {0} dosyası mevcut değil</value>
+  </data>
+  <data name="UnexpectedMetaType" xml:space="preserve">
+    <value>Tanım Yükleme: Beklenmeyen MetaType: {0}</value>
+  </data>
+  <data name="MetaContent" xml:space="preserve">
+    <value>Meta verisi: {0}</value>
+  </data>
+  <data name="FailedDownloadMetaEntry" xml:space="preserve">
+    <value>{0} kod tanım dosyası indirilemedi</value>
+  </data>
+  <data name="FailedDeserializingMetaDefinition" xml:space="preserve">
+    <value>MetaDefinition ayrıştırılamadı</value>
+  </data>
+  <data name="FailedDownloadMetaDefinition" xml:space="preserve">
+    <value>Meta tanımları {0} adresinden indirilemedi</value>
+  </data>
+  <data name="FailedDeserializingReleaseDefinition" xml:space="preserve">
+    <value>Sürüm bilgisi ayrıştırılamadı</value>
+  </data>
+  <data name="FailedDownloadReleaseDefinition" xml:space="preserve">
+    <value>Son sürüm bilgisi {0} adresinden indirilemedi</value>
+  </data>
+  <data name="DecoderIgnoringLine" xml:space="preserve">
+    <value>Kod Çözücü: {0} satırı atlanıyor</value>
+  </data>
+  <data name="UemOsError" xml:space="preserve">
+    <value>UEM / OS Hatası</value>
+  </data>
+  <data name="FailedEnterRepl" xml:space="preserve">
+    <value>REPL moduna geçilemedi. Yanlış seri port aygıtı seçilmiş olabilir.</value>
+  </data>
+  <data name="FailedFwVersion" xml:space="preserve">
+    <value>Firmware sürüm denetimi başarısız oldu. En son PicoDurangoPOST sürümünü kullanıyor musunuz?</value>
+  </data>
+  <data name="FailedParseConfig" xml:space="preserve">
+    <value>Yapılandırma bilgileri ayrıştırılamadı.</value>
+  </data>
+  <data name="FailedGetVersion" xml:space="preserve">
+    <value>Sürüm yanıtı alınamadı!</value>
+  </data>
+  <data name="FailedGetState" xml:space="preserve">
+    <value>Yapılandırma durumu alınamadı!</value>
+  </data>
+  <data name="Unavailable" xml:space="preserve">
+    <value>Kullanılamıyor</value>
+  </data>
+  <data name="ScanButtonText" xml:space="preserve">
+    <value>Taramak için butona basın</value>
+  </data>
+  <data name="NotConnected" xml:space="preserve">
+    <value>Bağlı Değil</value>
+  </data>
+  <data name="Never" xml:space="preserve">
+    <value>Hiçbir zaman</value>
+  </data>
+  <data name="NewMetadataAvailable" xml:space="preserve">
+    <value>Yeni bir kod/tanım güncellemesi mevcut.</value>
+  </data>
+  <data name="NewMetadataAvailableInformation" xml:space="preserve">
+    <value>Bu güncelleme, konsolunuz için en güncel POST kodları ve hata tanımlarını içerir. Güncellemek istiyor musunuz?</value>
+  </data>
+  <data name="FailedUpdateMetadata" xml:space="preserve">
+    <value>Kod tanımları güncellenemedi</value>
+  </data>
+  <data name="NewAppReleaseAvailable" xml:space="preserve">
+    <value>Yeni bir uygulama sürümü mevcut</value>
+  </data>
+  <data name="NewFirmwareReleaseAvailable" xml:space="preserve">
+    <value>Yeni bir Pico firmware sürümü mevcut</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Hata</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Uyarı</value>
+  </data>
+  <data name="FailedUpdateMetadataMessageBoxError" xml:space="preserve">
+    <value>Kod tanımları güncellenemedi: {0}</value>
+  </data>
+  <data name="FailedLoadLocalMetadata" xml:space="preserve">
+    <value>Yerel kod tanımları yüklenemedi</value>
+  </data>
+  <data name="FailedLoadLocalMetadataMessageBoxWarning" xml:space="preserve">
+    <value>Yerel kod tanımları yüklenemedi. Uygulama kod açıklamaları olmadan devam edecek.</value>
+  </data>
+  <data name="FailedLoadMetadata" xml:space="preserve">
+    <value>Kod tanımları yüklenemedi</value>
+  </data>
+  <data name="FailedLoadLocalMetadataMessageBoxError" xml:space="preserve">
+    <value>Kod tanımları yüklenemedi: {0}</value>
+  </data>
+  <data name="SaveLogFiles" xml:space="preserve">
+    <value>Log Dosyasını Kaydet</value>
+  </data>
+  <data name="LogFiles" xml:space="preserve">
+    <value>Log Dosyaları</value>
+  </data>
+  <data name="ErrorSavingLogFile" xml:space="preserve">
+    <value>Log dosyası kaydedilirken hata oluştu</value>
+  </data>
+  <data name="ErrorSavingLogFileMessageBoxError" xml:space="preserve">
+    <value>Log dosyası kaydedilemedi: {0}</value>
+  </data>
+  <data name="ErrorConection" xml:space="preserve">
+    <value>Bağlantı hatası</value>
+  </data>
+  <data name="ErrorConectionMessageBoxError" xml:space="preserve">
+    <value>Seri porta bağlanılamadı: {0}</value>
+  </data>
+  <data name="FailedGetMainWindow" xml:space="preserve">
+    <value>MainWindow penceresine erişilemedi</value>
+  </data>
+  <data name="FailedGetApplicationLifetime" xml:space="preserve">
+    <value>ApplicationLifetime nesnesine erişilemedi</value>
+  </data>
+  <data name="Configuration" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
+  <data name="LanguageSettings" xml:space="preserve">
+    <value>Dil Ayarları</value>
+  </data>
+  <data name="ThemeSettings" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="UpdateSettings" xml:space="preserve">
+    <value>Güncelleme Ayarları</value>
+  </data>
+  <data name="CheckApplicationUpdates" xml:space="preserve">
+    <value>Uygulama güncellemelerini denetle</value>
+  </data>
+  <data name="ApplicationUpdateUrl" xml:space="preserve">
+    <value>Uygulama güncelleme URL'si</value>
+  </data>
+  <data name="CheckCodeUpdates" xml:space="preserve">
+    <value>Hata/Post kod güncellemelerini denetle</value>
+  </data>
+  <data name="CodeMetaUrl" xml:space="preserve">
+    <value>Kod tanımları URL'si</value>
+  </data>
+  <data name="CheckFirmwareUpdates" xml:space="preserve">
+    <value>Firmware güncellemelerini denetle</value>
+  </data>
+  <data name="LogSettings" xml:space="preserve">
+    <value>Log Ayarları</value>
+  </data>
+  <data name="ShowTimestamps" xml:space="preserve">
+    <value>Zaman damgalarını göster</value>
+  </data>
+  <data name="DescriptionDisplaySettings" xml:space="preserve">
+    <value>Açıklama görünüm modu</value>
+  </data>
+  <data name="TimestampLabel" xml:space="preserve">
+    <value>Zaman: </value>
+  </data>
+  <data name="FirmwareUpdateUrl" xml:space="preserve">
+    <value>Firmware güncelleme URL'si</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="XboxPostCodeSerialMonitor" xml:space="preserve">
+    <value>Xbox PostCode Seri Port Monitörü</value>
+  </data>
+  <data name="RefreshPorts" xml:space="preserve">
+    <value>Portları Yenile</value>
+  </data>
+  <data name="Connect" xml:space="preserve">
+    <value>Bağlan</value>
+  </data>
+  <data name="Disconnect" xml:space="preserve">
+    <value>Bağlantıyı Kes</value>
+  </data>
+  <data name="SaveLog" xml:space="preserve">
+    <value>Logu Kaydet</value>
+  </data>
+  <data name="ClearLog" xml:space="preserve">
+    <value>Logu Temizle</value>
+  </data>
+  <data name="AppVersion" xml:space="preserve">
+    <value>Uygulama Sürümü:</value>
+  </data>
+  <data name="Debug" xml:space="preserve">
+    <value>Hata Ayıklama</value>
+  </data>
+  <data name="FillDummyData" xml:space="preserve">
+    <value>Görünümü test verileriyle doldur</value>
+  </data>
+  <data name="Fill" xml:space="preserve">
+    <value>Doldur</value>
+  </data>
+  <data name="DecodeStandaloneCode" xml:space="preserve">
+    <value>Bağımsız kod çözümle</value>
+  </data>
+  <data name="CodeFlavorLabel" xml:space="preserve">
+    <value>Kod türü (Flavor)</value>
+  </data>
+  <data name="ConsoleTypeLabel" xml:space="preserve">
+    <value>Konsol modeli</value>
+  </data>
+  <data name="Decode" xml:space="preserve">
+    <value>Çözümle</value>
+  </data>
+  <data name="Result" xml:space="preserve">
+    <value>Sonuç</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Kapat</value>
+  </data>
+  <data name="InvalidCodeFormatMessageBoxError" xml:space="preserve">
+    <value>Geçersiz kod biçimi: {0}</value>
+  </data>
+  <data name="VisitXboxResearch" xml:space="preserve">
+    <value>XboxResearch.com Sitesini Ziyaret Et</value>
+  </data>
+  <data name="ConsiderDonation" xml:space="preserve">
+    <value>Geliştiriciye Destek Ol (Bağış)</value>
+  </data>
+  <data name="PicoFirmware" xml:space="preserve">
+    <value>Pico Firmware:</value>
+  </data>
+  <data name="MetadataUpdate" xml:space="preserve">
+    <value>Kod Güncellemesi:</value>
+  </data>
+  <data name="FailedOpenUrl" xml:space="preserve">
+    <value>URL açılamadı: {0}</value>
+  </data>
+  <data name="RestartRequired" xml:space="preserve">
+    <value>Yeniden Başlatma Gerekli</value>
+  </data>
+  <data name="LanguageChangedPleaseRestart" xml:space="preserve">
+    <value>Dil değiştirildi. Değişikliğin etkili olması için lütfen uygulamayı yeniden başlatın.</value>
+  </data>
+  <data name="FilterAll" xml:space="preserve">
+    <value>Tümü</value>
+  </data>
+  <data name="FilterErrorsOnly" xml:space="preserve">
+    <value>Sadece Hatalar</value>
+  </data>
+  <data name="FilterWarningsAndErrors" xml:space="preserve">
+    <value>Uyarı ve Hatalar</value>
+  </data>
+  <data name="FilterSearchPlaceholder" xml:space="preserve">
+    <value>Kod, ad veya açıklama ara...</value>
+  </data>
+  <data name="AutoReconnect" xml:space="preserve">
+    <value>Otomatik Yeniden Bağlan</value>
+  </data>
+  <data name="FilterLabel" xml:space="preserve">
+    <value>Filtre:</value>
+  </data>
+</root>

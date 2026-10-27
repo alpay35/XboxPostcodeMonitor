@@ -453,4 +453,22 @@
     <value>O idioma foi alterado. Reinicie o aplicativo para que a alteração entre em vigor.</value>
     <comment>In ViewModels/ConfigurationDialogViewModel.cs</comment>
   </data>
+  <data name="FilterAll" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="FilterErrorsOnly" xml:space="preserve">
+    <value>Apenas Erros</value>
+  </data>
+  <data name="FilterWarningsAndErrors" xml:space="preserve">
+    <value>Avisos e Erros</value>
+  </data>
+  <data name="FilterSearchPlaceholder" xml:space="preserve">
+    <value>Buscar código, nome ou descrição...</value>
+  </data>
+  <data name="AutoReconnect" xml:space="preserve">
+    <value>Reconectar Automático</value>
+  </data>
+  <data name="FilterLabel" xml:space="preserve">
+    <value>Filtro:</value>
+  </data>
 </root>

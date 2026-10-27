@@ -6,7 +6,7 @@
     "CheckForFwUpdates": true,
     "CodesMetaBaseUrl": "https://errors.xboxresearch.com/",
     "MetaStoragePath": "meta",
-    "Language": "en-US",
+    "Language": "tr-TR",
     "MetaJsonUrl": "https://errors.xboxresearch.com/meta.json"
   }
 }

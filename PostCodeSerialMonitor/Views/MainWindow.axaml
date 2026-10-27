@@ -195,7 +195,7 @@
                 <ScrollViewer x:Name="LogScrollViewer"
                              HorizontalScrollBarVisibility="Disabled"
                              VerticalScrollBarVisibility="Auto">
-                    <ItemsRepeater x:Name="LogItemsRepeater" ItemsSource="{Binding LogEntries}">
+                    <ItemsRepeater x:Name="LogItemsRepeater" ItemsSource="{Binding FilteredLogEntries}">
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate>
                                 <Button Classes="logRow"

@@ -847,5 +847,52 @@ namespace PostCodeSerialMonitor.Assets {
                 return ResourceManager.GetString("LanguageChangedPleaseRestart", resourceCulture);
             }
         }
+        public static string FilterAll
+        {
+            get
+            {
+                return ResourceManager.GetString("FilterAll", resourceCulture);
+            }
+        }
+
+        public static string FilterErrorsOnly
+        {
+            get
+            {
+                return ResourceManager.GetString("FilterErrorsOnly", resourceCulture);
+            }
+        }
+
+        public static string FilterWarningsAndErrors
+        {
+            get
+            {
+                return ResourceManager.GetString("FilterWarningsAndErrors", resourceCulture);
+            }
+        }
+
+        public static string FilterSearchPlaceholder
+        {
+            get
+            {
+                return ResourceManager.GetString("FilterSearchPlaceholder", resourceCulture);
+            }
+        }
+
+        public static string AutoReconnect
+        {
+            get
+            {
+                return ResourceManager.GetString("AutoReconnect", resourceCulture);
+            }
+        }
+
+        public static string FilterLabel
+        {
+            get
+            {
+                return ResourceManager.GetString("FilterLabel", resourceCulture);
+            }
+        }
     }
 }

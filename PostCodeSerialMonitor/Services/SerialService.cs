@@ -23,6 +23,7 @@ public class SerialService : IDisposable
     private readonly ILogger<SerialService> _logger;
     internal ISerialPort? _serialPort;
     internal CancellationTokenSource? _readCts;
+    internal Func<string, int, ISerialPort>? PortFactory { get; set; }
     public event Action<string>? DataReceived;
     public event Action? Disconnected;
     public event Action? DeviceStateChanged;
@@ -154,7 +155,7 @@ public class SerialService : IDisposable
         if (_serialPort != null && _serialPort.IsOpen)
             _serialPort.Close();
 
-        _serialPort = new SerialPortWrapper(portName, baudRate);
+        _serialPort = PortFactory != null ? PortFactory(portName, baudRate) : new SerialPortWrapper(portName, baudRate);
         _serialPort.Open();
         _readCts = new CancellationTokenSource();
 

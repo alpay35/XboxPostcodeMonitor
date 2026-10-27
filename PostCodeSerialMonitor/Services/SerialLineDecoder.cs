@@ -47,12 +47,12 @@ public class SerialLineDecoder
             Code = code
         };
 
-        // First: Try to find distinct code
+        // First: Try to find distinct post code
         var postCode = _metaDefinitionService.PostCodes.FirstOrDefault(x => 
             x.Code == code && 
             x.CodeFlavor == flavor && 
             !x.Bitmask.HasValue &&
-            (x.ConsoleType.Contains(consoleType) || x.ConsoleType.First() == ConsoleType.ALL));
+            (x.ConsoleType.Contains(consoleType) || x.ConsoleType.Contains(ConsoleType.ALL)));
         
         if (postCode != null)
         {
@@ -62,11 +62,25 @@ public class SerialLineDecoder
             return decoded;
         }
 
+        // Check for specific OS error definition
+        var osError = _metaDefinitionService.OSErrors.FirstOrDefault(x =>
+            x.Code == code &&
+            x.CodeFlavor == flavor &&
+            (x.ConsoleType.Contains(consoleType) || x.ConsoleType.Contains(ConsoleType.ALL)));
+
+        if (osError != null)
+        {
+            decoded.SeverityLevel = CodeSeverity.Error;
+            decoded.Name = $"{flavor}_{osError.Name}";
+            decoded.Description = osError.Description;
+            return decoded;
+        }
+
         // Second: Try to find error bitmask
         var postCodes = _metaDefinitionService.PostCodes.Where(x => 
             x.CodeFlavor == flavor &&
             x.Bitmask.HasValue &&
-            (x.ConsoleType.Contains(consoleType) || x.ConsoleType.First() == ConsoleType.ALL) &&
+            (x.ConsoleType.Contains(consoleType) || x.ConsoleType.Contains(ConsoleType.ALL)) &&
             (code & x.Bitmask.Value) == x.Code
         ).ToList();
         
@@ -86,7 +100,7 @@ public class SerialLineDecoder
         // Third: Try to match with more generic ErrorMasks
         var errorMask = _metaDefinitionService.ErrorMasks.FirstOrDefault(x => 
             x.CodeFlavor == flavor &&
-            (x.ConsoleType.Contains(consoleType) || x.ConsoleType.First() == ConsoleType.ALL) &&
+            (x.ConsoleType.Contains(consoleType) || x.ConsoleType.Contains(ConsoleType.ALL)) &&
             (code & x.Bitmask) == x.Code
         );
 

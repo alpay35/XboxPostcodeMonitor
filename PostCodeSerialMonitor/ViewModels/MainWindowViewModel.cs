@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PostCodeSerialMonitor.Views;
@@ -34,12 +36,18 @@ public partial class MainWindowViewModel : ViewModelBase
     private GithubUpdateService _githubUpdateService;
     private IStorageProvider? _storageProvider;
 
+    private string? _lastConnectedPortName;
+    private CancellationTokenSource? _autoReconnectCts;
+
     public ObservableCollection<PortInfo> SerialPorts { get; } = new();
 
     public ObservableCollection<ConsoleType> ConsoleModels { get; } = new();
 
     public ObservableCollection<LogEntry> LogEntries { get; } = new();
+    public ObservableCollection<LogEntry> FilteredLogEntries { get; } = new();
     public ObservableCollection<string> RawLogEntries { get; } = new();
+
+    public ObservableCollection<string> FilterModes { get; } = new(["All", "ErrorsOnly", "WarningsAndErrors", "SMC", "SP", "CPU", "OS"]);
 
     private string lastConnectedPicoFwVersion = Assets.Resources.Unavailable;
 
@@ -79,6 +87,18 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool showTimestamps;
+
+    [ObservableProperty]
+    private bool autoReconnect;
+
+    [ObservableProperty]
+    private string searchFilter = string.Empty;
+
+    [ObservableProperty]
+    private string selectedFilterMode = "All";
+
+    partial void OnSearchFilterChanged(string value) => ApplyFilter();
+    partial void OnSelectedFilterModeChanged(string value) => ApplyFilter();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsDescriptionInlineMode))]
@@ -256,8 +276,54 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ClearLog()
     {
         LogEntries.Clear();
+        FilteredLogEntries.Clear();
         RawLogEntries.Clear();
         SelectedLogEntry = null;
+    }
+
+    private bool MatchesFilter(LogEntry entry)
+    {
+        if (entry == null) return false;
+
+        bool modeMatches = SelectedFilterMode switch
+        {
+            "ErrorsOnly" => entry.IsError,
+            "WarningsAndErrors" => entry.IsError || entry.IsWarning,
+            "SMC" => entry.DecodedCode.Flavor == CodeFlavor.SMC,
+            "SP" => entry.DecodedCode.Flavor == CodeFlavor.SP,
+            "CPU" => entry.DecodedCode.Flavor == CodeFlavor.CPU,
+            "OS" => entry.DecodedCode.Flavor == CodeFlavor.OS,
+            _ => true
+        };
+
+        if (!modeMatches) return false;
+
+        if (string.IsNullOrWhiteSpace(SearchFilter))
+            return true;
+
+        var search = SearchFilter.Trim();
+        if (entry.CodeHexText.Contains(search, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (!string.IsNullOrEmpty(entry.NameText) && entry.NameText.Contains(search, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (!string.IsNullOrEmpty(entry.Description) && entry.Description.Contains(search, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (entry.FlavorText.Contains(search, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
+    private void ApplyFilter()
+    {
+        FilteredLogEntries.Clear();
+        foreach (var entry in LogEntries)
+        {
+            if (MatchesFilter(entry))
+            {
+                FilteredLogEntries.Add(entry);
+            }
+        }
     }
 
     [RelayCommand]
@@ -364,11 +430,14 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             if (IsConnected)
             {
+                _autoReconnectCts?.Cancel();
+                _lastConnectedPortName = null;
                 _serialService.Disconnect();
                 IsConnected = false;
             }
             else
             {
+                _lastConnectedPortName = SelectedPort.Name;
                 await _serialService.ConnectAsync(SelectedPort.Name);
                 ClearLog();
                 IsConnected = true;
@@ -399,46 +468,117 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+    private void StartAutoReconnect()
+    {
+        _autoReconnectCts?.Cancel();
+        _autoReconnectCts = new CancellationTokenSource();
+        var token = _autoReconnectCts.Token;
+
+        Task.Run(async () =>
+        {
+            while (!token.IsCancellationRequested && !IsConnected && AutoReconnect)
+            {
+                try
+                {
+                    await Task.Delay(2000, token);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+
+                if (token.IsCancellationRequested || IsConnected || !AutoReconnect)
+                    break;
+
+                var ports = _serialService.GetPortInfos().ToList();
+                var matchingPort = ports.FirstOrDefault(p => p.Name == _lastConnectedPortName);
+
+                if (matchingPort != null)
+                {
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        if (!IsConnected && AutoReconnect)
+                        {
+                            SelectedPort = matchingPort;
+                            try
+                            {
+                                await _serialService.ConnectAsync(matchingPort.Name);
+                                IsConnected = true;
+                                _logger.LogInformation("Auto-reconnected to port {Port}", matchingPort.Name);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogDebug(ex, "Auto-reconnect attempt failed");
+                            }
+                        }
+                    });
+                }
+            }
+        }, token);
+    }
+
     private void OnDataReceived(string line)
     {
-        RawLogEntries.Add(line);
-
-        var decoded = _serialLineDecoder.DecodeLine(line, SelectedConsoleModel);
-        if (decoded != null)
+        Dispatcher.UIThread.Post(() =>
         {
-            LogEntries.Add(new LogEntry { DecodedCode = decoded });
-        }
+            RawLogEntries.Add(line);
+
+            var decoded = _serialLineDecoder.DecodeLine(line, SelectedConsoleModel);
+            if (decoded != null)
+            {
+                var entry = new LogEntry { DecodedCode = decoded };
+                LogEntries.Add(entry);
+                if (MatchesFilter(entry))
+                {
+                    FilteredLogEntries.Add(entry);
+                }
+            }
+        });
     }
 
     private void OnDisconnected()
     {
-        IsConnected = false;
-        FirmwareVersion = Assets.Resources.NotConnected;
-        BuildDate = string.Empty;
-        MirrorDisplay = false;
-        PortraitMode = false;
-        PrintTimestamps = false;
-        I2cScanOutput = Assets.Resources.ScanButtonText;
-        var prevSelectedPort = SelectedPort;
-        RefreshPorts();
-        if (prevSelectedPort != null && SerialPorts.Contains(prevSelectedPort)) {
-            SelectedPort = prevSelectedPort;
-        }
+        Dispatcher.UIThread.Post(() =>
+        {
+            IsConnected = false;
+            FirmwareVersion = Assets.Resources.NotConnected;
+            BuildDate = string.Empty;
+            MirrorDisplay = false;
+            PortraitMode = false;
+            PrintTimestamps = false;
+            I2cScanOutput = Assets.Resources.ScanButtonText;
+            var prevSelectedPort = SelectedPort;
+            RefreshPorts();
+            if (prevSelectedPort != null && SerialPorts.Contains(prevSelectedPort)) {
+                SelectedPort = prevSelectedPort;
+            }
+
+            if (AutoReconnect && !string.IsNullOrEmpty(_lastConnectedPortName))
+            {
+                StartAutoReconnect();
+            }
+        });
     }
 
     private void OnDeviceStateChanged()
     {
-        FirmwareVersion = _serialService.FirmwareVersion;
-        BuildDate = _serialService.BuildDate;
-        // Retain this info even after disconnected, for saving the Log
-        lastConnectedPicoFwVersion = $"{FirmwareVersion} ({BuildDate})";
+        Dispatcher.UIThread.Post(() =>
+        {
+            FirmwareVersion = _serialService.FirmwareVersion;
+            BuildDate = _serialService.BuildDate;
+            // Retain this info even after disconnected, for saving the Log
+            lastConnectedPicoFwVersion = $"{FirmwareVersion} ({BuildDate})";
+        });
     }
 
     private void OnDeviceConfigChanged()
     {
-        MirrorDisplay = _serialService.MirrorDisplay;
-        PortraitMode = _serialService.PortraitMode;
-        PrintTimestamps = _serialService.PrintTimestamps;
+        Dispatcher.UIThread.Post(() =>
+        {
+            MirrorDisplay = _serialService.MirrorDisplay;
+            PortraitMode = _serialService.PortraitMode;
+            PrintTimestamps = _serialService.PrintTimestamps;
+        });
     }
 
     [RelayCommand]
@@ -475,5 +615,6 @@ public partial class MainWindowViewModel : ViewModelBase
         };
 
         await dialog.ShowDialog(GetParentWindow());
+        ApplyFilter();
     }
-} 
+}

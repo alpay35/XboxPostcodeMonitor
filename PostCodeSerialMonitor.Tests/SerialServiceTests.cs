@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,139 +11,101 @@ using Xunit;
 
 namespace PostCodeSerialMonitor.Tests;
 
-/*
+public class TestSerialPort : ISerialPort
+{
+    private readonly Queue<char> _readQueue = new();
+    public List<string> WrittenData { get; } = new();
+    public bool IsOpen { get; set; } = true;
+    public int BytesToRead => _readQueue.Count;
+
+    public void Feed(string text)
+    {
+        foreach (var c in text)
+            _readQueue.Enqueue(c);
+    }
+
+    public void Open() => IsOpen = true;
+    public void Close() => IsOpen = false;
+
+    public void Write(string text)
+    {
+        WrittenData.Add(text);
+    }
+
+    public void WriteLine(string text)
+    {
+        WrittenData.Add(text + "\r\n");
+        if (text == "\x03" || text == "")
+        {
+            Feed(">> ");
+        }
+        else if (text == "version")
+        {
+            Feed("FW: v0.4.1 20260730\r\n>> ");
+        }
+        else if (text == "config")
+        {
+            Feed("Notice: Showing config\r\nDisplay mirrored:       ON\r\nDisp rotation portrait: OFF\r\nPrint timestamps:       ON\r\nPrint colors:           ON\r\n>> ");
+        }
+    }
+
+    public char ReadChar() => _readQueue.Count > 0 ? _readQueue.Dequeue() : '\0';
+    public string ReadLine() => "";
+    public void Dispose() => Close();
+}
+
 public class SerialServiceTests
 {
-    private readonly Mock<ISerialPort> _mockSerialPort;
-    private readonly SerialService _serialService;
-
-    public SerialServiceTests()
+    [Fact]
+    public async Task Connect_ShouldSendResetSequenceAndParseVersionAndConfig()
     {
         var logger = new Mock<ILogger<SerialService>>();
-        _mockSerialPort = new Mock<ISerialPort>();
-        _serialService = new SerialService(logger.Object);
+        var service = new SerialService(logger.Object);
+        var testPort = new TestSerialPort();
+        service.PortFactory = (name, baud) => testPort;
+
+        await service.ConnectAsync("COM1");
+
+        Assert.Equal("v0.4.1", service.FirmwareVersion);
+        Assert.Equal("20260730", service.BuildDate);
+        Assert.True(service.MirrorDisplay);
+        Assert.False(service.PortraitMode);
+        Assert.True(service.PrintTimestamps);
+        Assert.Contains(testPort.WrittenData, x => x.Contains("version"));
+        Assert.Contains(testPort.WrittenData, x => x.Contains("config"));
+        Assert.Contains(testPort.WrittenData, x => x.Contains("post"));
+
+        service.Disconnect();
+        Assert.False(service.IsOpen);
     }
 
     [Fact]
-    public async Task Connect_ShouldSendResetSequence()
+    public async Task Connect_ShouldThrowWhenFirmwareVersionTooOld()
     {
-        // Arrange
-        var outputSequence = new[]
+        var logger = new Mock<ILogger<SerialService>>();
+        var service = new SerialService(logger.Object);
+        var testPort = new TestSerialPort();
+        service.PortFactory = (name, baud) => testPort;
+
+        testPort.WrittenData.Clear();
+        // Override behavior by feeding old version
+        var oldPort = new Mock<ISerialPort>();
+        var readQueue = new Queue<char>();
+        void EnqueueText(string t) { foreach (var c in t) readQueue.Enqueue(c); }
+        oldPort.SetupGet(p => p.IsOpen).Returns(true);
+        oldPort.SetupGet(p => p.BytesToRead).Returns(() => readQueue.Count);
+        oldPort.Setup(p => p.ReadChar()).Returns(() => readQueue.Count > 0 ? readQueue.Dequeue() : '\0');
+        oldPort.Setup(p => p.WriteLine(It.IsAny<string>())).Callback<string>(s =>
         {
-            ">>version",
-            "FW: v0.2.1 20240521",
-            ">>config",
-            "Notice: Showing config",
-            "Display mirrored:       ON",
-            "Disp rotation portrait: OFF",
-            "Print timestamps:       ON",
-            "Print colors:           ON",
-            ">>"
-        };
+            if (s == "\x03" || s == "") EnqueueText(">> ");
+            else if (s == "version") EnqueueText("FW: v0.2.1 20240521\r\n>> ");
+        });
 
-        var currentLine = 0;
-        _mockSerialPort.Setup(x => x.ReadLine())
-            .Returns(() => outputSequence[currentLine++]);
+        service.PortFactory = (name, baud) => oldPort.Object;
 
-        // Act
-        await _serialService.ConnectAsync("COM1");
-
-        // Assert
-        _mockSerialPort.Verify(x => x.Write("\x03"), Times.Once); // CTRL+C
-        _mockSerialPort.Verify(x => x.Write("\r\n"), Times.Once); // ENTER
-        _mockSerialPort.Verify(x => x.Write("version\r\n"), Times.Once);
-        _mockSerialPort.Verify(x => x.Write("config\r\n"), Times.Once);
-        _mockSerialPort.Verify(x => x.Write("post\r\n"), Times.Once);
-    }
-
-    [Fact]
-    public async Task Connect_ShouldParseVersionInfo()
-    {
-        // Arrange
-        var outputSequence = new[]
-        {
-            ">>",
-            "FW: v0.2.1 20240521",
-            ">>",
-            "Notice: Showing config",
-            "Display mirrored:       ON",
-            "Disp rotation portrait: OFF",
-            "Print timestamps:       ON",
-            "Print colors:           ON",
-            ">>"
-        };
-
-        var currentLine = 0;
-        _mockSerialPort.Setup(x => x.ReadLine())
-            .Returns(() => outputSequence[currentLine++]);
-
-        // Act
-        await _serialService.ConnectAsync("COM1");
-
-        // Assert
-        Assert.Equal("v0.2.1", _serialService.FirmwareVersion);
-        Assert.Equal("20240521", _serialService.BuildDate);
-    }
-
-    [Fact]
-    public async Task Connect_ShouldParseConfigState()
-    {
-        // Arrange
-        var outputSequence = new[]
-        {
-            ">>",
-            "FW: v0.2.1 20240521",
-            "Notice: Showing config",
-            "Display mirrored:       ON",
-            "Disp rotation portrait: OFF",
-            "Print timestamps:       ON",
-            "Print colors:           ON",
-            ">>"
-        };
-
-        var currentLine = 0;
-        _mockSerialPort.Setup(x => x.ReadLine())
-            .Returns(() => outputSequence[currentLine++]);
-
-        // Act
-        await _serialService.ConnectAsync("COM1");
-
-        // Assert
-        Assert.True(_serialService.MirrorDisplay);
-        Assert.False(_serialService.PortraitMode);
-        Assert.True(_serialService.PrintTimestamps);
-    }
-
-    [Fact]
-    public async Task Connect_ShouldRetryOnFailedReset()
-    {
-        // Arrange
-        var outputSequence = new[]
-        {
-            "some unexpected output",
-            ">>",
-            "FW: v0.2.1 20240521",
-            "Notice: Showing config",
-            "Display mirrored:       ON",
-            "Disp rotation portrait: OFF",
-            "Print timestamps:       ON",
-            "Print colors:           ON",
-            ">>"
-        };
-
-        var currentLine = 0;
-        _mockSerialPort.Setup(x => x.ReadLine())
-            .Returns(() => outputSequence[currentLine++]);
-
-        // Act
-        await _serialService.ConnectAsync("COM1");
-
-        // Assert
-        _mockSerialPort.Verify(x => x.Write("\x03"), Times.Exactly(2)); // CTRL+C twice
-        _mockSerialPort.Verify(x => x.Write("\r\n"), Times.Exactly(2)); // ENTER twice
+        await Assert.ThrowsAsync<Exception>(() => service.ConnectAsync("COM1"));
     }
 }
-*/
 
 public class SerialServiceDisconnectTests
 {
@@ -174,14 +137,11 @@ public class SerialServiceDisconnectTests
 
         var readLoopTask = Task.Run(() => service.ReadLoop(service._readCts.Token));
 
-        // Ensure ReadLoop is genuinely blocked inside ReadChar() before disconnecting,
-        // to reproduce "close happens while a read is pending" deterministically.
         Assert.True(readerBlocked.Wait(TimeSpan.FromSeconds(2)), "ReadLoop never reached ReadChar()");
 
-        // Act: single call, same as MainWindowViewModel.ToggleConnectionAsync does
+        // Act
         service.Disconnect();
 
-        // Wait for the background ReadLoop thread's catch block to finish too.
         await readLoopTask;
 
         // Assert
