@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xbox PostCode Web Serial Monitor</title>
+  <link rel="icon" type="image/x-icon" href="../PostCodeSerialMonitor/Assets/avalonia-logo.ico">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">X</div>
+      <div>
+        <div class="brand-title" id="appTitle">Xbox PostCode Web Monitörü</div>
+        <div class="brand-subtitle" id="appSubtitle">PicoDurangoPOST Tarayıcı Seri Port İzleyici</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-badge">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Bağlı Değil</span>
+      </div>
+      <button id="langToggle">TR</button>
+    </div>
+  </header>
+
+  <!-- App Body -->
+  <div class="app-container">
+    
+    <!-- Connection & Console Controls -->
+    <div class="control-bar">
+      <div class="control-group">
+        <button class="primary" id="connectBtn">🔌 Porta Bağlan</button>
+        <button class="danger" id="disconnectBtn" style="display: none;">❌ Bağlantıyı Kes</button>
+      </div>
+
+      <div class="control-group">
+        <span class="control-label" id="lblBaud">Baud Hızı:</span>
+        <select id="baudSelect">
+          <option value="115200" selected>115200</option>
+          <option value="57600">57600</option>
+          <option value="38400">38400</option>
+          <option value="9600">9600</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <span class="control-label" id="lblConsole">Konsol Modeli:</span>
+        <select id="consoleSelect">
+          <option value="ALL">ALL (Tümü)</option>
+          <option value="XboxOnePhat">Xbox One (Phat)</option>
+          <option value="XboxOneS">Xbox One S</option>
+          <option value="XboxOneX">Xbox One X</option>
+          <option value="XboxSeriesS">Xbox Series S</option>
+          <option value="XboxSeriesX">Xbox Series X</option>
+        </select>
+      </div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" id="autoReconnectCheck">
+        <span id="lblAutoReconnect">Otomatik Yeniden Bağlan</span>
+      </label>
+
+      <div style="margin-left: auto;" class="control-group">
+        <span id="metaInfoLabel" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);"></span>
+        <button id="updateMetaBtn">🔄 Kodları Güncelle</button>
+      </div>
+    </div>
+
+    <!-- Log & Filter Controls -->
+    <div class="control-bar" style="background-color: var(--bg-tertiary);">
+      <button id="saveLogBtn">💾 Logu Kaydet</button>
+      <button id="clearLogBtn">🗑️ Logu Temizle</button>
+
+      <div class="control-group" style="margin-left: 10px;">
+        <span class="control-label" id="lblFilter">Filtre:</span>
+        <select id="filterSelect">
+          <option value="All">Tümü (All)</option>
+          <option value="ErrorsOnly">Sadece Hatalar (Errors Only)</option>
+          <option value="WarningsAndErrors">Uyarı ve Hatalar</option>
+          <option value="SMC">SMC Kodları</option>
+          <option value="SP">SP Kodları</option>
+          <option value="CPU">CPU Kodları</option>
+          <option value="OS">OS Kodları</option>
+        </select>
+      </div>
+
+      <input type="text" class="search-input" id="searchInput" placeholder="Kod, isim veya arıza açıklaması ara...">
+
+      <label class="checkbox-label" style="margin-left: 10px;">
+        <input type="checkbox" id="autoScrollCheck" checked>
+        <span id="lblAutoScroll">Oto Kaydır</span>
+      </label>
+
+      <button id="openModalBtn" style="margin-left: auto;">🔍 Manuel Kod Çöz</button>
+    </div>
+
+    <!-- Log Table Area -->
+    <div class="log-container">
+      <div class="log-header">
+        <div id="colTime">Zaman</div>
+        <div id="colType">Tür</div>
+        <div id="colCode">Kod</div>
+        <div id="colName">Tanım / Hata Adı</div>
+        <div id="colDesc">Arıza Açıklaması & Onarım Rehberi</div>
+      </div>
+      <div class="log-list" id="logList">
+        <!-- Log rows dynamically injected here -->
+      </div>
+    </div>
+
+    <!-- Detail Bottom Panel -->
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-title" id="detailTitle"></div>
+      <div class="detail-desc" id="detailDesc"></div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div id="fwVersionDisplay">Pico Firmware: Bağlı Değil</div>
+    <div>
+      <a href="https://errors.xboxresearch.com" target="_blank" rel="noopener">XboxResearch Veritabanı</a> • 
+      <a href="https://github.com/xboxoneresearch/PicoDurangoPOST" target="_blank" rel="noopener">PicoDurangoPOST</a> • 
+      <a href="https://github.com/alpay35/XboxPostcodeMonitor" target="_blank" rel="noopener">GitHub (alpay35)</a>
+    </div>
+  </footer>
+
+  <!-- Standalone Decoder Modal -->
+  <div class="modal-overlay" id="decoderModal">
+    <div class="modal-content">
+      <div class="modal-title" id="modalTitle">Manuel POST / Hata Kodu Çözümleyici</div>
+
+      <div class="form-group">
+        <label id="modalCodeLabel">Hex Kod:</label>
+        <input type="text" id="modalCodeInput" placeholder="Örn: E001, CC01, 80070002" style="font-family: var(--font-mono); font-size: 14px;">
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <div class="form-group" style="flex: 1;">
+          <label id="modalTypeLabel">Kod Türü:</label>
+          <select id="modalFlavorSelect">
+            <option value="SMC">SMC</option>
+            <option value="SP">SP</option>
+            <option value="CPU">CPU</option>
+            <option value="OS">OS</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label id="modalConsoleLabel">Konsol Modeli:</label>
+          <select id="modalConsoleSelect">
+            <option value="ALL">ALL (Tümü)</option>
+            <option value="XboxOnePhat">Xbox One (Phat)</option>
+            <option value="XboxOneS">Xbox One S</option>
+            <option value="XboxOneX">Xbox One X</option>
+            <option value="XboxSeriesS">Xbox Series S</option>
+            <option value="XboxSeriesX">Xbox Series X</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="decode-result-box" id="modalDecodeResult">Sonuç burada görüntülenecektir...</div>
+
+      <div class="modal-actions">
+        <button class="primary" id="decodeBtn">Çözümle</button>
+        <button id="closeModalBtn">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

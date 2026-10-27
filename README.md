@@ -13,6 +13,20 @@ Hata tanımları ve POST kodları [errors.xboxresearch.com](https://errors.xboxr
 
 ---
 
+## 🌐 Tarayıcı Sürümü (Web Serial Monitor - Kurulumsuz)
+
+Herhangi bir kurulum yapmadan, doğrudan **Google Chrome**, **Microsoft Edge**, **Opera** veya **Brave** tarayıcınızdan Xbox POST kodlarını anlık izleyebilirsiniz!
+
+- 🔗 **Canlı Web Uygulaması**: [https://alpay35.github.io/XboxPostcodeMonitor/](https://alpay35.github.io/XboxPostcodeMonitor/)
+- **Özellikler**:
+  - Web Serial API ile doğrudan USB/UART COM port bağlantısı.
+  - Sürücü veya .NET runtime kurulumu gerektirmez.
+  - Windows, macOS, Linux, Chromebook ve Android (USB OTG) destekler.
+  - Kod arama, filtreleme, çevrimdışı çalışma, otomatik metadata güncelleme ve .log dışa aktarma.
+  - Bağımsız (Standalone) Manuel Kod Çözümleme aracı.
+
+---
+
 ## 🚀 Temel Özellikler
 
 - **Gerçek Zamanlı Seri Port İzleme**: SMC, SP, CPU ve OS kodlarını anında ekranda listeler ve renklendirir (Bilgi, Uyarı, Hata).
